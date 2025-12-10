@@ -8,7 +8,7 @@
     </div>
     <ul class="nav-links" :class="{ 'nav-links--open': isNavOpen }">
       <li><router-link to="/orders" @click="closeNav">All Orders</router-link></li>
-      <li><router-link to="/shipped" @click="closeNav">Shipped</router-link></li>
+      <li><router-link to="/shipped" @click="closeNav">To Be Shipped</router-link></li>
       <li><router-link to="/products" @click="closeNav">Products</router-link></li>
     </ul>
     <button class="hamburger" @click="toggleNav">
