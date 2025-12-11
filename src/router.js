@@ -4,17 +4,7 @@ import OrderDetail from "./components/OrderDetail";
 import ProductList from "./components/ProductList";
 import ProductDetail from "./components/ProductDetail";
 import ProductForm from "./components/ProductForm";
-import ShippedOrdersPage from "./components/ShippedOrdersPage.vue";
-
-
-const ShippedOrdersPage = {
-  template: `
-    <div style="padding: 2rem;">
-      <h2>Shipped Orders</h2>
-      <p>List of shipped orders will appear here.</p>
-    </div>
-  `
-}
+import ShippedOrdersPage from "./components/ShippedOrdersPage.vue"; //use the .vue component
 
 const routes = [
   { path: "/", component: OrderList },
@@ -24,7 +14,7 @@ const routes = [
   { path: "/product/:id", component: ProductDetail },
   { path: "/product/:id/edit", component: ProductForm },
   { path: "/product/add", component: ProductForm },
-  { path: '/shipped', component: ShippedOrdersPage }
+  { path: "/shipped", component: ShippedOrdersPage } //use imported component
 ];
 
 const router = createRouter({
