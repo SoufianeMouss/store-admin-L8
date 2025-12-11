@@ -2,12 +2,13 @@
   <nav>
     <div class="logo">
       <a href="/">
-        <img src="/algonquin-pet-store.png" alt="Algonquin Pet Store Logo">
+        <img src="/new_logo.png" alt="Best Buy Logo">
       </a>
       Admin Portal
     </div>
     <ul class="nav-links" :class="{ 'nav-links--open': isNavOpen }">
       <li><router-link to="/orders" @click="closeNav">Orders</router-link></li>
+      <li><router-link to="/shipped" @click="closeNav">Shipped</router-link></li>
       <li><router-link to="/products" @click="closeNav">Products</router-link></li>
     </ul>
     <button class="hamburger" @click="toggleNav">
@@ -40,7 +41,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
+  background-color: #0046be;
   color: #fff;
   padding-top: 0.5rem;
   padding-left: 1rem;
