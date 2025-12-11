@@ -1,7 +1,7 @@
 <template>
   <div class="order-detail" v-if="orderExists">
     <div class="action-button">
-      <button @click="completeOrder" class="button">Complete Order</button>
+      <button @click="completeOrder" class="button">Process Order</button>
     </div>
     <br/>
     <div class="order-header">
@@ -108,7 +108,7 @@ export default {
             orderId: this.order.orderId,
             customerId: this.order.customerId,
             items: this.order.items,
-            status: 2 // ✅ Complete = shipped
+            status: 1 //Processing = ready to ship
           })
         })
 
@@ -117,9 +117,9 @@ export default {
         }
 
         // Update local state so UI reflects new status
-        this.order.status = 2
+        this.order.status = 1
 
-        alert(`Order ${this.order.orderId} marked as complete / shipped`)
+        alert(`Order ${this.order.orderId}  marked as processed (ready to ship)`)
 
         // Optional: navigate back to orders list
         // this.$router.push('/orders')
