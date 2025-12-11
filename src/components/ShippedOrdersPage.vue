@@ -8,7 +8,7 @@
 
     <div v-if="loading" class="status">Loading processed orders...</div>
     <div v-else-if="error" class="status error">{{ error }}</div>
-    <div v-else-if="orders.length === 0" class="status">
+    <div v-else-if="!orders || orders.length === 0" class="status">
       No processed orders waiting for shipment.
     </div>
 
@@ -63,19 +63,31 @@ export default {
   },
   methods: {
     async fetchProcessedOrders() {
-      this.loading = true
-      this.error = null
-      try {
-        // Status=1 => Processing (i.e. ready to ship)
-        const res = await fetch('/makeline/order?status=1')
-        if (!res.ok) throw new Error('Failed to load processed orders')
-        this.orders = await res.json()
-      } catch (err) {
+    this.loading = true
+    this.error = null
+
+    try {
+        const res = await fetch('/makeline/order?status=1') // or 2
+
+        // If backend returns 204 No Content OR bad response, treat as empty list
+        if (res.status === 204) {
+        this.orders = []
+        return
+        }
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+        const data = await res.json()
+
+        // ✅ force it to be an array
+        this.orders = Array.isArray(data) ? data : []
+    } catch (err) {
         console.error(err)
         this.error = 'Could not load processed orders'
-      } finally {
+        this.orders = []  // ✅ important: keep it an array even on error
+    } finally {
         this.loading = false
-      }
+    }
     },
     async shipOrder(order, index) {
       try {
