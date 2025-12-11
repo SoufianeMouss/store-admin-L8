@@ -32,17 +32,19 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:${{ github.sha }} .
-          docker build -t $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test .
+          docker build -t "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$IMAGE_TAG" .
+          docker build -t "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test" .
 
       - name: Push Docker Image (SHA + test)
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:${{ github.sha }}
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test
+          docker push "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$IMAGE_TAG"
+          docker push "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:test"
 
   # -----------------------------
   # 2️⃣ TEST JOB
@@ -79,10 +81,11 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker pull $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:${{ github.sha }}
-          docker tag $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:${{ github.sha }} $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
-          docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+          docker pull "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$IMAGE_TAG"
+          docker tag "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$IMAGE_TAG" "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest"
+          docker push "$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest"
 
   # -----------------------------
   # 4️⃣ DEPLOY JOB (AKS)
@@ -104,19 +107,23 @@ jobs:
 
       - name: Deploy to AKS (immutable SHA tag)
         env:
-          NAMESPACE: ${{ vars.NAMESPACE }}   # set this to "bestbuy" in repo variables
+          # ✅ safest: hardcode your known namespace
+          # If you prefer a repo variable, set vars.K8S_NAMESPACE = bestbuy and use that instead.
+          NAMESPACE: bestbuy
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_IMAGE_NAME: ${{ vars.DOCKER_IMAGE_NAME }}
           DEPLOYMENT_NAME: ${{ vars.DEPLOYMENT_NAME }}
           CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          kubectl -n $NAMESPACE set image deployment/$DEPLOYMENT_NAME \
-            $CONTAINER_NAME=$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:${{ github.sha }}
-          kubectl -n $NAMESPACE rollout status deployment/$DEPLOYMENT_NAME
+          kubectl -n "$NAMESPACE" set image "deployment/$DEPLOYMENT_NAME" \
+            "$CONTAINER_NAME=$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$IMAGE_TAG"
+
+          kubectl -n "$NAMESPACE" rollout status "deployment/$DEPLOYMENT_NAME"
 
       - name: Verify Deployment
         env:
-          NAMESPACE: ${{ vars.NAMESPACE }}
+          NAMESPACE: bestbuy
         run: |
-          kubectl -n $NAMESPACE get pods -o wide
-          kubectl -n $NAMESPACE get svc
+          kubectl -n "$NAMESPACE" get pods -o wide
+          kubectl -n "$NAMESPACE" get svc
